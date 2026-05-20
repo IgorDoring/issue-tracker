@@ -20,6 +20,10 @@
     </clr-dg-row>
     <clr-dg-footer>{{issues.length}} issues</clr-dg-footer>
   </clr-datagrid>
+  <button class="btn btn-icon" [disabled]="currentPage === 1" (click)="loadIssues(currentPage - 1)">Previous</button>
+<button class="btn btn-outline-primary" [class.btn-primary]="page === currentPage"
+    (click)="loadIssues(page)" *ngFor="let page of pages">{{page}}</button>
+<button class="btn btn-icon" [disabled]="currentPage === totalPages" (click)="loadIssues(currentPage + 1)">Next</button>
 </ng-container>
 <app-issue-report *ngIf="showReportIssue === true" (formClose)="onCloseReport()"></app-issue-report>
 <app-confirm-dialog *ngIf="selectedIssue" [issueNo]="selectedIssue.issueNo" (confirm)="onConfirm($event)"></app-confirm-dialog>

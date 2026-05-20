@@ -14,27 +14,39 @@ export class IssueListComponent implements OnInit {
   issues: Issue[] = [];
   showReportIssue = false;
   selectedIssue: Issue | null = null;
-
+  pages: number[] = []
+  currentPage = 1
+  totalPages = 1
   constructor(private issueService: IssuesService) { }
 
-  private getIssues() {
-    this.issues = this.issueService.getPendingIssues();
+  loadIssues(page?: number) {
+    this.issueService.getPendingIssues(page).subscribe({
+      next: (res) => {
+        this.issues = res.issues
+        this.currentPage = res.page
+        this.totalPages = res.totalPages
+        this.pages = Array.from({length: res.totalPages}, (_, i) => i+ 1)
+      },
+      error: (error) => {
+        console.error(error)
+      }
+    })
   }
 
   ngOnInit() {
-    this.getIssues();
+    this.loadIssues();
   }
 
   onCloseReport() {
     this.showReportIssue = false;
-    this.getIssues();
+    this.loadIssues();
    }
 
   onConfirm(confirmed: boolean) {
     if (confirmed && this.selectedIssue) {
       this.issueService.completeIssue(this.selectedIssue);
-      this.getIssues();
+      this.loadIssues();
     }
-  this.selectedIssue = null;
+    this.selectedIssue = null;
   }
 }

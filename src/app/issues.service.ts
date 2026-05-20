@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Issue } from './issues';
 import { issues } from '../assets/mock-issues';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,11 +10,11 @@ import { issues } from '../assets/mock-issues';
 export class IssuesService {
 
   private issues: Issue[] = issues;
+  private apiUrl = 'http://localhost:5000/issues'
+  constructor(private http: HttpClient) { }
 
-  constructor() { }
-
-  getPendingIssues(): Issue[] {
-    return this.issues.filter(issue => !issue.completed);
+  getPendingIssues(page?: number): Observable<{issues: Issue[], page: number, pageSize: number, total: number, totalPages: number}> {
+    return this.http.get<{issues: Issue[], page: number, pageSize: number, total: number, totalPages: number}>(`${this.apiUrl}?page=${page ?? 1}`)
   }
 
   createIssue(issue: Issue) {
