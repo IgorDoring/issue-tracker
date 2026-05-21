@@ -7,7 +7,7 @@ import { BehaviorSubject, map, Observable, tap } from 'rxjs'
     providedIn: 'root'
 })
 export class IssuesService {
-    private apiUrl = 'https://issue-tracker-backend-production-563d.up.railway.app'
+    private apiUrl = 'https://issue-tracker-backend-production-563d.up.railway.app/issues'
 
     private issuesSubject = new BehaviorSubject<Issue[]>([])
     private pageSubject = new BehaviorSubject<number>(1)
@@ -29,7 +29,7 @@ export class IssuesService {
                 pageSize: number
                 total: number
                 totalPages: number
-            }>(`${this.apiUrl}/issues?page=${page ?? 1}`)
+            }>(`${this.apiUrl}?page=${page ?? 1}`)
             .subscribe({
                 next: (res) => {
                     this.issuesSubject.next(res.issues)
@@ -57,7 +57,7 @@ export class IssuesService {
 
     getSuggestions(title: string): Observable<Issue[]> {
         return this.http
-            .get<{ issues: Issue[] }>(`${this.apiUrl}/issues?search=${encodeURIComponent(title)}`)
+            .get<{ issues: Issue[] }>(`${this.apiUrl}?search=${encodeURIComponent(title)}`)
             .pipe(map((res) => res.issues))
     }
 }
