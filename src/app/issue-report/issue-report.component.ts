@@ -1,23 +1,36 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { Issue } from '../issues'
 import { IssuesService } from '../issues.service'
+import { debounceTime, distinctUntilChanged, filter, Subject, switchMap, takeUntil } from 'rxjs'
 
 @Component({
     selector: 'app-issue-report',
     templateUrl: './issue-report.component.html',
     styleUrls: ['./issue-report.component.css']
 })
-export class IssueReportComponent implements OnInit {
+export class IssueReportComponent implements OnInit, OnDestroy {
     @Output() formClose = new EventEmitter()
     suggestions: Issue[] = []
+    private destroy$ = new Subject<void>()
 
     constructor(private issueService: IssuesService) {}
 
     ngOnInit(): void {
-        // this.issueForm.controls.title.valueChanges.subscribe((title) => {
-        //     this.suggestions = this.issueService.getSuggestions(title);
-        // })
+        this.issueForm.controls.title.valueChanges
+            .pipe(
+                debounceTime(300),
+                distinctUntilChanged(),
+                filter((title) => title.trim().length > 3),
+                switchMap((title) => this.issueService.getSuggestions(title.trim())),
+                takeUntil(this.destroy$)
+            )
+            .subscribe((suggestions) => (this.suggestions = suggestions))
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next()
+        this.destroy$.complete()
     }
 
     issueForm = new FormGroup<IssueForm>({

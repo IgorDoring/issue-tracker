@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Issue } from './issues'
 import { HttpClient } from '@angular/common/http'
-import { BehaviorSubject, Observable, tap } from 'rxjs'
+import { BehaviorSubject, map, Observable, tap } from 'rxjs'
 
 @Injectable({
     providedIn: 'root'
@@ -55,11 +55,9 @@ export class IssuesService {
             .pipe(tap(() => this.getPendingIssues()))
     }
 
-    //  getSuggestions(title: string): Issue[] {
-    //   if (title.length > 3) {
-    //   return this.issues.filter(issue =>
-    //   issue.title.indexOf(title) !== -1);
-    //   }
-    //   return [];
-    //  }
+    getSuggestions(title: string): Observable<Issue[]> {
+        return this.http
+            .get<{ issues: Issue[] }>(`${this.apiUrl}?search=${encodeURIComponent(title)}`)
+            .pipe(map((res) => res.issues))
+    }
 }
