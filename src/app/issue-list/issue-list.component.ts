@@ -34,9 +34,11 @@ export class IssueListComponent implements OnInit {
     }
 
     onConfirm(confirmed: boolean) {
-        // if (confirmed && this.selectedIssue) {
-        //   this.issueService.completeIssue(this.selectedIssue);
-        // }
-        // this.selectedIssue = null;
+        if (confirmed && this.selectedIssue) {
+            this.issueService.completeIssue(this.selectedIssue).subscribe({
+                error: (err) => console.error(err)
+            })
+        }
+        this.selectedIssue = null
     }
 }

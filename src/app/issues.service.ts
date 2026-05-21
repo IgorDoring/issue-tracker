@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Issue } from './issues'
 import { HttpClient } from '@angular/common/http'
-import { BehaviorSubject, tap } from 'rxjs'
+import { BehaviorSubject, Observable, tap } from 'rxjs'
 
 @Injectable({
     providedIn: 'root'
@@ -43,20 +43,17 @@ export class IssuesService {
             })
     }
 
-    createIssue(issue: Omit<Issue, 'issueNo'>) {
+    createIssue(issue: Omit<Issue, 'issueNo'>): Observable<Issue> {
         return this.http
             .post<Issue>(this.apiUrl, issue)
             .pipe(tap(() => this.getPendingIssues(this.pageSubject.value)))
     }
 
-    // completeIssue(issue: Issue) {
-    //   const selectedIssue: Issue = {
-    //   ...issue,
-    //   completed: new Date()
-    //   };
-    //   const index = this.issues.findIndex(i => i === issue);
-    //   this.issues[index] = selectedIssue;
-    //  }
+    completeIssue(issue: Issue): Observable<Issue> {
+        return this.http
+            .put<Issue>(`${this.apiUrl}/${issue.issueNo}`, { completed: new Date() })
+            .pipe(tap(() => this.getPendingIssues()))
+    }
 
     //  getSuggestions(title: string): Issue[] {
     //   if (title.length > 3) {
