@@ -1,29 +1,68 @@
 <ng-container *ngIf="showReportIssue === false">
-  <button class="btn btn-primary" (click)="showReportIssue = true">Add new issue</button>
-  <clr-datagrid>
-    <clr-dg-column [clrDgField]="'issueNo'" [clrDgColType]="'number'">Issue No</clr-dg-column>
-    <clr-dg-column [clrDgField]="'type'">Type</clr-dg-column>
-    <clr-dg-column [clrDgField]="'title'">Title</clr-dg-column>
-    <clr-dg-column [clrDgField]="'description'">Description</clr-dg-column>
-    <clr-dg-column [clrDgField]="'priority'">Priority</clr-dg-column>
-    <clr-dg-row *clrDgItems="let issue of issues">
-      <clr-dg-action-overflow>
-        <button class="action-item" (click)="selectedIssue = issue">Resolve</button>
-      </clr-dg-action-overflow>
-      <clr-dg-cell>{{issue.issueNo}}</clr-dg-cell>
-      <clr-dg-cell>{{issue.type}}</clr-dg-cell>
-      <clr-dg-cell>{{issue.title}}</clr-dg-cell>
-      <clr-dg-cell>{{issue.description}}</clr-dg-cell>
-      <clr-dg-cell>
-        <span class="label" [class.label-danger]="issue.priority === 'high'">{{issue.priority}}</span>
-      </clr-dg-cell>
-    </clr-dg-row>
-    <clr-dg-footer>{{issues.length}} issues</clr-dg-footer>
-  </clr-datagrid>
-  <button class="btn btn-icon" [disabled]="currentPage === 1" (click)="loadIssues(currentPage - 1)">Previous</button>
-<button class="btn btn-outline-primary" [class.btn-primary]="page === currentPage"
-    (click)="loadIssues(page)" *ngFor="let page of pages">{{page}}</button>
-<button class="btn btn-icon" [disabled]="currentPage === totalPages" (click)="loadIssues(currentPage + 1)">Next</button>
+    <ng-container
+        *ngIf="{
+            issues: issues$ | async,
+            page: page$ | async,
+            totalPages: totalPages$ | async,
+            total: total$ | async,
+            pages: pages$ | async
+        } as IssueObject"
+    >
+        <button class="btn btn-primary" (click)="showReportIssue = true">Add new issue</button>
+        <clr-datagrid>
+            <clr-dg-column [clrDgField]="'issueNo'" [clrDgColType]="'number'"
+                >Issue No</clr-dg-column
+            >
+            <clr-dg-column [clrDgField]="'type'">Type</clr-dg-column>
+            <clr-dg-column [clrDgField]="'title'">Title</clr-dg-column>
+            <clr-dg-column [clrDgField]="'description'">Description</clr-dg-column>
+            <clr-dg-column [clrDgField]="'priority'">Priority</clr-dg-column>
+            <clr-dg-row *clrDgItems="let issue of IssueObject.issues || []">
+                <clr-dg-action-overflow>
+                    <button class="action-item" (click)="selectedIssue = issue">Resolve</button>
+                </clr-dg-action-overflow>
+                <clr-dg-cell>{{ issue.issueNo }}</clr-dg-cell>
+                <clr-dg-cell>{{ issue.type }}</clr-dg-cell>
+                <clr-dg-cell>{{ issue.title }}</clr-dg-cell>
+                <clr-dg-cell>{{ issue.description }}</clr-dg-cell>
+                <clr-dg-cell>
+                    <span class="label" [class.label-danger]="issue.priority === 'high'">{{
+                        issue.priority
+                    }}</span>
+                </clr-dg-cell>
+            </clr-dg-row>
+            <clr-dg-footer
+                >{{ IssueObject.issues?.length }} / {{ IssueObject.total }} issues</clr-dg-footer
+            >
+        </clr-datagrid>
+
+        <button
+            class="btn btn-icon"
+            [disabled]="IssueObject.page === 1"
+            (click)="loadPendingIssues((IssueObject.page ?? 1) - 1)"
+        >
+            Previous
+        </button>
+        <button
+            class="btn btn-outline-primary"
+            [class.btn-primary]="p === IssueObject.page"
+            (click)="loadPendingIssues(p)"
+            *ngFor="let p of IssueObject.pages"
+        >
+            {{ p }}
+        </button>
+        <button
+            class="btn btn-icon"
+            [disabled]="IssueObject.page === IssueObject.totalPages"
+            (click)="loadPendingIssues((IssueObject.page ?? 1) + 1)"
+        >
+            Next
+        </button>
+    </ng-container>
 </ng-container>
 <app-issue-report *ngIf="showReportIssue === true" (formClose)="onCloseReport()"></app-issue-report>
-<app-confirm-dialog *ngIf="selectedIssue" [issueNo]="selectedIssue.issueNo" (confirm)="onConfirm($event)"></app-confirm-dialog>
+<app-confirm-dialog
+    *ngIf="selectedIssue"
+    [issueNo]="selectedIssue.issueNo"
+    (confirm)="onConfirm($event)"
+></app-confirm-dialog>
