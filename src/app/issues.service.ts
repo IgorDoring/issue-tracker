@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core'
 import { Issue } from './issues'
 import { HttpClient } from '@angular/common/http'
 import { BehaviorSubject, map, Observable, tap } from 'rxjs'
+import { environment } from 'src/environments/environment'
 
 @Injectable({
     providedIn: 'root'
 })
 export class IssuesService {
-    private apiUrl = 'https://issue-tracker-backend-production-563d.up.railway.app/issues'
+    private apiUrl = environment.apiUrl
 
     private issuesSubject = new BehaviorSubject<Issue[]>([])
     private pageSubject = new BehaviorSubject<number>(1)
