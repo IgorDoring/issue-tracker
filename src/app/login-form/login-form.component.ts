@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { NgForm } from '@angular/forms'
 import { LoginService } from '../login.service'
 import { Router } from '@angular/router'
@@ -8,7 +8,7 @@ import { Router } from '@angular/router'
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.css']
 })
-export class LoginFormComponent {
+export class LoginFormComponent implements OnInit {
   username = ''
   password = ''
   hasError = false
@@ -18,9 +18,14 @@ export class LoginFormComponent {
     private router: Router
   ) {}
 
+  ngOnInit(): void {
+    if (this.loginService.isLoggedIn()) this.router.navigate(['/issues'])
+  }
+
   onSubmit(form: NgForm) {
     const username = form.value['username']
     const password = form.value['password']
+    console.log({ username, password })
     this.loginService.login({ username, password }).subscribe({
       next: () => {
         this.router.navigate(['/issues'])
